@@ -1,4 +1,4 @@
-package effective_java.ch03;
+package effective_java.item03;
 
 import java.io.Serializable;
 
