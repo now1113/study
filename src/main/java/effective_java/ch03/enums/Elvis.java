@@ -1,4 +1,4 @@
-package effective_java.ch02.enums;
+package effective_java.ch03.enums;
 
 public enum Elvis {
     INSTANCE;

@@ -1,4 +1,4 @@
-package effective_java.ch02;
+package effective_java.ch03;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
