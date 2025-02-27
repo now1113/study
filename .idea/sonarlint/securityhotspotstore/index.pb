@@ -43,5 +43,3 @@ U
 %src/main/java/argo/level1/간격.java,c\4\c46e2d4311ae59930854aa68bac9846af69300a0
 h
 8src/main/java/argo/level1/나머지가1이되는수.java,9\1\911582826cc5de2d533d1f9f14a1fbdd68aae7d2
-j
-:src/main/java/argo/level1/자연수뒤집어배열로.java,e\e\ee2697040b478f90a751cab9457c21f1349042d6
