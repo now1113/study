@@ -53,3 +53,5 @@ d
 4src/main/java/argo/level1/정수제곱근판별.java,5\8\588fd075e1a8582ec461008b51a4475b1e338b1f
 a
 1src/main/java/argo/level1/정수내림차순.java,b\2\b288f3da8774ae82bc3cfa90b0bcf116cd08fd83
+p
+@src/main/java/argo/level1/나누어떨어지는숫자배열.java,5\5\5521419df361747f61e4383503da8405209f4fe5

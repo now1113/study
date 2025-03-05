@@ -1,3 +1,18 @@
-.gradle/*
+# Gradle 관련 파일 제외
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
 
-/build/*
+# 빌드 결과물 제외
+/build/
+out/
+
+# IntelliJ IDEA 설정 파일 제외
+.idea/
+*.iml
+
+# SonarLint 캐시 제외
+.sonarlint/
+
+# 로그 및 임시 파일 제외
+*.log
+*.tmp
