@@ -55,3 +55,11 @@ a
 1src/main/java/argo/level1/정수내림차순.java,b\2\b288f3da8774ae82bc3cfa90b0bcf116cd08fd83
 p
 @src/main/java/argo/level1/나누어떨어지는숫자배열.java,5\5\5521419df361747f61e4383503da8405209f4fe5
+d
+4src/main/java/argo/level1/없는숫자더하기.java,1\3\131543aa0926d033dc205463e7dbc7c18d2c975d
+j
+:src/main/java/argo/level1/제일작은수제거하기.java,6\9\69e389a64fd9f2aa7987cad996793387f90a9406
+Z
+*src/main/java/argo/live/stack/MyStack.java,b\9\b91179d2669aa958347bd4c6af1dc98b37c01b7b
+g
+7src/main/java/argo/level1/핸드폰번호가리기.java,a\d\ad8e708dcf7f5924f6e18d06a3f20b8f91b53ee6
