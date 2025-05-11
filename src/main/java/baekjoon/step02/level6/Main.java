@@ -23,16 +23,15 @@ public class Main {
     }
 
     private static void solution(int hour, int minute, int cookTime) {
-        minute += cookTime;
+        int totalMinutes = hour * 60 + minute + cookTime;
 
-        if (minute < 60) {
-            System.out.printf("%d %d", hour, minute);
-            return;
-        }
-        if (minute >= 60) {
+        int resultHour = (totalMinutes / 60) % 24;
+        int resultMinute = totalMinutes % 60;
 
 
-        }
+
+        System.out.printf("%d %d\n", resultHour, resultMinute);
+
 
     }
 }
