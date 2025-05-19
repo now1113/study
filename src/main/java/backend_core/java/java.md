@@ -14,19 +14,19 @@
 
 ### Q. JVM은 어떤 구조로 되어 있나요?
 
-1. **Class Loader**
-   2. `.class`파일을 읽어 들여 **메모리에 로드**한다.
-   3. **로딩 -> 링크(Linking) -> 초기화** 단계로 구성됨
-2. **Runtime Data Area (실행 중 할당되는 메모리 영역)**
-   3. **Heap**: 객체가 저장되는 영역(GC 대상)
-   4. **Stack**: 메서드 호출 프레임 저장, 지역 변수 포함
-   5. **Method Area**: 클래스 정보, static 변수, 메서드 코드 등 저장
-   6. **Native Method Stack**: C/C++ 등의 네이티브 메서드 호출 시 사용
-3. **Execution Engine**
-   4. **Interpreter**: 바이트코드를 한 줄씩 해석하여 실행
-   5. **JIT Compiler (Just-In-Tine)**: 반복 실행되는 코드를 **기계어로 변환하여 캐싱**, 속도 향상
-4. **Garbage Collector (GC)**
-   5. 사용하지 않는 객체를 **자동으로 메모리에서 제거**
+- **Class Loader**
+  - `.class`파일을 읽어 들여 **메모리에 로드**한다.
+  - **로딩 -> 링크(Linking) -> 초기화** 단계로 구성됨
+- **Runtime Data Area (실행 중 할당되는 메모리 영역)**
+  - **Heap**: 객체가 저장되는 영역(GC 대상)
+  - **Stack**: 메서드 호출 프레임 저장, 지역 변수 포함
+  - **Method Area**: 클래스 정보, static 변수, 메서드 코드 등 저장
+  - **Native Method Stack**: C/C++ 등의 네이티브 메서드 호출 시 사용
+- **Execution Engine**
+  - **Interpreter**: 바이트코드를 한 줄씩 해석하여 실행
+  - **JIT Compiler (Just-In-Tine)**: 반복 실행되는 코드를 **기계어로 변환하여 캐싱**, 속도 향상
+- **Garbage Collector (GC)**
+  - 사용하지 않는 객체를 **자동으로 메모리에서 제거**
 
 ### Q. 자바는 왜 플랫폼 독립적인가요
 
