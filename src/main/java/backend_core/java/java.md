@@ -124,7 +124,7 @@ void modify(User user) {
 }
 ```
 
-### Q. 자바에서 진짜 Call by Value 방식은 불가능한가요?
+### Q. 자바에서 진짜 Call by Reference 방식은 불가능한가요?
 
 - 그렇다. **Call by Reference는 변수의 주소 자체를 넘기는 방식**인데, 자바는 그걸 직접 지원하지 않음
   - 즉 **메서드에서 호출자의 변수 자체를 바꾸는 것은 불가능**
