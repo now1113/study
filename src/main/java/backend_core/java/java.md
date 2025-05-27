@@ -141,3 +141,306 @@ void modify(User user) {
 | int, boolean 등 | Value      | 값 자체 변경    | 없음   |
 | 객체             | 참조값의 Value | 내부 변경      | 있음   |
 | 객체             | 참조 자체 변경   | 없음         |      |
+
+
+## 객체지향의 4대 특성
+
+1. 캡슐화 (Encapsulation)
+2. 상속 (Inheritance)
+3. 다형성 (Polymorphism)
+4. 추상화 (Abstraction)
+
+### 캡슐화 (Encapsulation)
+
+- **정의**: 데이터(필드)와 데이터를 처리하는 행위(메서드)를 하나의 클래스로 묶고, 외부에 일부만 공개하는 것
+- **자바에서의 구현 방법**
+  - 필드에 `private` 접근 제어자 사용
+  - `public` getter/setter 메서드를 통해 접근 허용
+- 이유: 무분별한 접근을 방지하고, 객체의 상태를 일관성 있게 유지하기 위함
+
+```java
+public class User {
+    private String name;
+
+  public String getName() {
+      return name;
+  }
+
+  public void setName(String name) {
+    if (name != null && !name.isBlank()) {
+        this.name = name;
+    }
+  }
+}
+```
+
+- Java 14+의 `record`는 불변 객체에 캡슐화 개념을 간단히 적용 가능
+
+### 상속 (Inheritance)
+
+- **정의**: 기존 클래스를 확장하여 새로운 클래스를 만드는 것
+- **자바에서의 구현 방법**: `extends` 키워드 사용
+
+```java
+public class Animal {
+  public void sound() {
+    System.out.println("sound");
+  }
+}
+
+public class Dog extends Animal {
+  @Override
+  public void sound() {
+    System.out.println("멍멍");
+  }
+}
+```
+
+- 주의 사항
+  - 단일 상속만 지원 (`extends`는 하나의 클래스만 상속 가능)
+  - 코드 재사용은 되지만, 과도한 상속은 오히려 유지보수 어려움
+
+### 다형성 (Polymorphism)
+
+- **정의**: 하나의 객체가 여러 형태를 가질 수 있는 것
+- **자바에서의 구현 방법**
+  - **상속 + 오버라이딩**
+  - **인터페이스 + 구현 클래스**
+  - **업캐스팅을 통해 부모 타입으로 자식 객체를 참조**
+
+```java
+public class Cat extends Animal {
+  @Override
+  public void sound() {
+    System.out.println("야옹");
+  }
+}
+
+public class Main {
+  public static void main(String[] args) {
+    Animal an1 = new Dog(); // 업 캐스팅
+    Animal an2 = new Cat();
+
+    an1.sound();
+    an2.sound();
+  }
+}
+```
+
+- **유형**
+  - **정적 다형성: 메서드 오버로딩 (컴파일 시 결정)**
+  - **동적 다형성: 메서드 오버라이딩 (런타임 시 결정)**
+
+
+### 추상화 (Abstraction)
+
+- **정의**: 복잡한 로직은 숨기고, 필요한 것만 드러내는 것 (필요한 것만 인터페이스로 노출)
+- **자바에서의 구현 방법**
+  - `interface` 또는 `abstract class`로 정의
+  - 메서드 시그니처만 정의하고, 구체 로직은 구현 클래스에서 작성
+
+```java
+public interface PaymentStrategy {
+  void pay(int amount);
+}
+
+public class KakaoPay implements PaymentStrategy {
+  @Override
+  public void pay(int amount) {
+    System.out.println("카카오페이");
+  }
+}
+```
+
+- 사용하는 이유
+  - 클라이언트는 구체 구현을 몰라도 되고, 새로운 기능이 들어와도 OCP 원칙을 지킬 수 있음 (확장에는 열려있고, 수정에는 닫혀 있음)
+
+
+## 클래스 / 객체
+
+### static과 instance 차이
+
+| 구분        | static                    | instance             |
+| --------- |---------------------------|----------------------|
+| 메모리 영역    | **메서드 영역** (Method Area) 에 저장 | **힙** (Heap) 에 저장        |
+| 소속        | 클래스에 소속 (`클래스.변수/메서드`)    | 객체에 소속 (`객체.변수/메서드`) |
+| 메모리 할당 시점 | 클래스 로딩 시 한 번만 할당됨         | 객체 생성 시마다 새로 할당됨     |
+| 대표 키워드    | `static`                  | 없음 (기본)              |
+| 접근 방법     | `클래스명.변수`, `클래스명.메서드()`   | `new` 생성 후 객체로 접근    |
+| 사용 목적     | 공통된 값, 유틸성 메서드, 상태 공유 등   | 객체 고유의 상태나 동작 필요할 때  |
+
+
+### static 예시
+
+```java
+public class Counter { 
+  public static int count = 0;    // 클래스 변수 (공유)
+
+  public Counter() {
+      count++;
+      this.id = count;
+  }
+}
+```
+```java
+Counter c1 = new Counter();
+Counter c2 = new Counter();
+
+System.out.println(c1.id); // 1
+System.out.println(c2.id); // 2
+System.out.println(Counter.count); // 2 (공유 변수)
+```
+
+### static은 왜 쓸까
+
+- **공통 상태를 관리할 때** -> ex) 전체 인스턴스 수, 전역 설정
+- **공통 유틸 클래스** -> ex) `Math.random()`, `Collections.sort()`
+- **객체 없이 호출하고 싶을 때** -> ex) `main()` 메서드
+
+### instance는 왜 쓸까
+
+- **객체 별로 고유한 상태를 가져야할 때**
+- 예: `User` 클래스에서 `name`, `email` 같은 정보는 인스턴스마다 다름
+
+```java
+User u1 = new User("A");
+User u2 = new User("B");
+```
+
+### 인터페이스 vs 추상 클래스
+
+| 항목       | 인터페이스 (`interface`)                             | 추상 클래스 (`abstract class`) |
+| -------- | ----------------------------------------------- | --------------------- |
+| 목적       | **기능 명세 (역할 중심)**                               | **공통 로직 제공 (기반 클래스 역할)** |
+| 다중 구현/상속 | 다중 구현 가능 (`implements`)                         | 단일 상속만 가능 (`extends`) |
+| 메서드      | 기본적으로 모두 `추상 메서드` (JDK 8 이후 `default`, `static` 허용) | 추상 메서드와 일반 메서드 모두 선언 가능 |
+| 필드 선언    | `public static final` 상수만 가능                    | 인스턴스 필드 선언 가능         |
+| 생성자      | 없음                                              | 생성자 선언 가능             |
+| 접근 제어자   | 모든 메서드/변수는 자동으로 `public`                        | 접근 제어자 자유롭게 사용 가능     |
+| 사용 용도    | 역할, 규칙, 행동을 정의할 때                               | 공통 기능을 가진 상위 클래스를 만들 때 |
+
+
+## Checked 예외 / Unchecked 예외
+
+### 자바 예외 클래스 계층 구조
+
+```text
+Throwable
+ ├─ Error (OutOfMemoryError 등 - 시스템 오류)
+ └─ Exception
+     ├─ Checked Exception (컴파일 시 체크됨)
+     └─ Unchecked Exception (RuntimeException 계열)
+```
+
+### 차이 정리
+
+| 항목          | Checked Exception           | Unchecked Exception                              |
+| ----------- | --------------------------- | ------------------------------------------------ |
+| 상속 대상       | `Exception`                 | `RuntimeException`                               |
+| 예외 처리 강제 여부 | **try-catch 또는 throws 필수**  | 컴파일러 강제 없음 (선택)                                  |
+| 발생 시점       | **컴파일 시점에 확인됨**             | **실행 시점(Runtime)에 발생**                           |
+| 대표 예시       | `IOException`, `SQLException` | `NullPointerException`, `IllegalArgumentException` |
+| 사용 목적       | **복구 가능한 예외 처리 (외부 환경)**    | **프로그래밍 실수, 버그 (논리 오류)**                         |
+| 언제 사용하는가?   | 외부 리소스 관련: 파일, DB, 네트워크 등   | 내부 코드 오류, 잘못된 인자, 조건 위반 등                        |
+
+
+### 언제 써야 할까
+
+| 상황                                | 추천 예외 유형                              |
+| --------------------------------- | ------------------------------------- |
+| 네트워크 오류, 파일 없거나 읽기 실패             | Checked Exception                     |
+| 잘못된 메서드 인자, NPE 가능성 등 코드 버그       | Unchecked Exception                   |
+| 서비스 로직 조건 위반 (`만 14세 미만 가입 불가` 등) | Unchecked (ex. `IllegalStateException`) |
+
+
+## String vs StringBuilder vs StringBuffer
+
+### String (불변 객체, `immutable`)
+
+```java
+String str = "hello";
+str += " world";
+```
+
+- `String`은 **불변 객체**라서 위 코드는 내부적으로 **새로운 문자열 객체를 매번 생성**함
+- 변경 불가능 -> 성능 저하 가능
+
+#### 문제점
+
+```java
+String result = "";
+for (int i = 0; i < 10000; i++) {
+    result += i;
+}
+```
+
+- 위 코드는 매 반복마다 **새로운 String + StringBuilder 생성 + toString()** 수행됨
+- 결국 **10000개 이상의 객체가 힙에 생성됨 -> 성능 저하 + GC 부하**
+
+### StringBuilder (가변 객체, `mutable`)
+
+```java
+StringBuilder sb = new StringBuilder();
+for (int i = 0; i < 10000; i++) {
+    sb.append(i);
+}
+String result = sb.toString();
+```
+
+- 내부적으로 `char[]` 배열을 이용해 문자열을 저장하고, 배열이 꽉 차면 자동으로 늘림
+- append 시 기존 객체에 덧붙임 -> **객체 재사용으로 성능 우수**
+- **단일 스레드 환경**에서 가장 빠름
+
+
+### StringBuffer (동기화 지원 버전)
+
+```java
+StringBuffer sb = new StringBuffer();
+sb.append("hello").append(" world");
+```
+- `StringBuilder`와 거의 동일한 내부 구조
+- 하지만 `append`, `insert` 등의 메서드가 `synchronized`로 되어 있음
+- 멀티 스레드 환경에서도 **안전하게 사용 가능**
+- 대신 **동기화로 인한 오버헤드 존재 -> 단일 스레드에서는 느림**
+
+### 비교 요약
+
+| 클래스           | 쓰레드 안전성 | 성능(빠름)  | 용도                           |
+| ------------- | ----- | ------- | ---------------------------- |
+| String        |  (불변) |  (가장 느림) | 문자열 변경이 거의 없는 경우             |
+| StringBuilder | (비동기) |  (가장 빠름) | 문자열을 **빈번히 변경**할 때, 단일 스레드에서 |
+| StringBuffer  |  (동기화) |  (중간 정도) | 멀티 스레드 환경에서 문자열을 변경할 때       |
+
+
+### 컴파일러 최적화
+
+```java
+String str = "hello" + " world";
+```
+
+- **컴파일 타임에 상수로 병합**됨 -> `String str = "hello world";`
+
+```java
+String str = "hello";
+str += " world";
+```
+
+- **Java 5 ~ 현재까지** 대부분의 컴파일러는 내부적으로 다음과 같이 변환
+
+```java
+StringBuilder sb = new StringBuilder("hello");
+sb.append(" world");
+String str = sb.toString();
+```
+
+- **간단한 문자열에는 `+` 연산자 사용해도 무방**
+- 단, **루프 안에서의 `+` 사용은 `StringBuilder` 재사용이 불가능하므로 반드시 직접 사용해야 함**
+
+### 정리
+
+| 상황                    | 추천 클래스          | 이유                             |
+| --------------------- | --------------- | ------------------------------ |
+| 문자열 연결이 1\~2번 정도인 경우  | `String`        | 컴파일 타임 최적화됨                    |
+| 문자열을 반복적으로 수정/추가      | `StringBuilder` | 가변 구조 + 빠름 (단일 스레드 기준)         |
+| 멀티 스레드에서 문자열을 공유하며 수정 | `StringBuffer`  | 쓰레드 안전 보장 (`synchronized`) 사용됨 |
+| 불변 문자열이 필요한 경우        | `String`        | 메모리 안전성, 해시코드 일관성 등에서 유리       |
