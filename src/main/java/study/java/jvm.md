@@ -101,9 +101,9 @@ public class MyClass {
 MyClass.myMethod(); // myMethod는 심볼릭 이름으로 저장되어 있다가 실제 메모리 주소로 변환되어 호출된다
 ```
 
-### 초기화 (Initialization
-- **초기화(Initialization** 단계는 클래스가 로드된 후, 실제로 **static 변수**와 **static 초기화 블럭**이 실행되는 단계다.
-- **static 초기화 블럭**(`static {}`)은 클래스가 청므 로드될 때 한번만 실행되며, 그 안에 있는 코드는 **static 변수**들을 **명시적으로 초기화**하거나, 복잡한 초기화 로직을 수행할 수 있다.
+### 초기화 (Initialization)
+- **초기화(Initialization)** 단계는 클래스가 로드된 후, 실제로 **static 변수**와 **static 초기화 블럭**이 실행되는 단계다.
+- **static 초기화 블럭**(`static {}`)은 클래스가 처음 로드될 때 한번만 실행되며, 그 안에 있는 코드는 **static 변수**들을 **명시적으로 초기화**하거나, 복잡한 초기화 로직을 수행할 수 있다.
 
 ```java
 public class MyClass {
