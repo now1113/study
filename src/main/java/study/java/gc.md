@@ -217,3 +217,85 @@ for (int i = 0; i < 1000; i++) {
 - 살아남은 객체는 Promotion되고, 오래 살아남을수록 GC 대상이 되기 어려움
 - GC의 핵심은 **Copying 방식, STW 시간 최소화, 적절한 Promotion**
 
+## 자바 버전별 GC 변화
+JVM은 자바 버전이 올라가면서 다양한 GC 알고리즘을 실험하고 기본값을 변경해왔다.  
+이는 **성능 개선, 지연 시간 감소, 애플리케이션 요구 변화** 등을 반영한 결과이다.
+
+### Java 7까지 - 기본은 `parallel GC`
+| 기본 GC | `Parallel GC`                           |
+| ----- | --------------------------------------- |
+| 특징    | Young / Old 영역 모두 **다중 스레드 기반**으로 GC 수행 |
+| 장점    | Throughput(처리량) 우수                      |
+| 단점    | STW 시간이 비교적 김, 지연 시간 관리 어려움             |
+
+> 단일 서버/대량 배치 작업 중심 환경에 적합
+
+### Java 8 - `parallel GC` 여전히 기본, `CMS`와 `G1 GC` 제공
+
+#### CMS (Concurrent Mark Sweep)
+- 특징: Old 영역 GC를 **앱 실행 중 병렬로 수행**
+- 장점: Major GC의 STW 시간 감소
+- 단점: **메모리 단편화**, 복잡한 튜닝 필요
+
+#### G1 GC (Garbage First)
+- 특징: **Heap을 Region으로 나누어** GC 수행
+- 장점: 예측 가능한 Pause Time (`-XX:MaxGCPauseMills`)
+- 도입: Java 7u4 (실험), Java 8에서 안정화
+> Java 8은 GC 튜닝의 시작점으로 널리 사용됨.  
+> `-XX+UseG1GC` 옵션으로 G1 사용 가능
+
+### Java 9 ~ 10 - 기본 GC가 `G1 GC`로 전환
+| 기본 GC | `G1 GC`                            |
+| ----- | ---------------------------------- |
+| 변화 이유 | 서버 환경에서 **짧은 Pause Time** 을 선호하게 됨 |
+| 개선 사항 | Full GC 튜닝 개선, 병렬화 강화              |
+> G1은 `Stop-The-World 시간을 줄이기 위해 기본값으로 채택`됨  
+> GC Pause를 수밀리초 단위로 제어하려는 요구에 대응
+
+
+### Java 11 - `ZGC`도입 (실험적)
+
+#### ZGC (Z Garbage Collector)
+- 특징: **정말 짧은 Stop-The-World (1ms 이하)**
+- 구조: Region 기반 + 색상 마킹 + Concurrent GC
+- 용도: **지연 시간(Latency)** 최우선 환경 (실시간 서비스 등)
+- JVM 옵션: `-XX:+UseZGC`
+- 단점: 메모리 사용량 큼 (Heap 8GB 이상 권장), Java 11 ~ 15 까지는 Linux only
+
+
+### Java 12 - `Shenandoah` 도입 (RedHat)
+- 특징: ZGC처럼 STW 최소화 목표
+- 장점: 병렬성 강화, 낮은 latency
+- JVM 옵션: `-XX:+UseShenandoahGC` (별도 빌드 필요)
+
+### Java 15 - ZGC, Shenandoah 정식화
+- ZGC: **Windows / macOS도 지원**
+- Shenandoah: OpenJDK에 기본 포함됨
+> G1은 여전히 기본, ZGC는 저지연 환경에서 널리 사용 가능해짐
+
+### Java 17
+- 기본 GC: 여전히 `G1 GC`
+- 새로운 흐름: **ZGC/Parallel/Serial/G1/Shenandoah 전부 안정적 선택 가능**
+- 선택 기준: 목적에 따라 명시적으로 GC 선택 가능 (`-XX:+UseXXXGC`)
+- 개선 사항: GC 로그 분석 기능 향상 (`Unified Logging`)
+
+### 정리: 자바 버전별 기본 GC
+
+| Java 버전    | 기본 GC       | 특징                        |
+| ---------- | ----------- | ------------------------- |
+| Java 7     | Parallel GC | Throughput 위주             |
+| Java 8     | Parallel GC | G1 사용 가능 (옵션)             |
+| Java 9\~14 | G1 GC       | 기본 GC 변경, CMS 폐지          |
+| Java 11    | G1 GC       | ZGC 실험적 도입                |
+| Java 15+   | G1 GC       | ZGC / Shenandoah 정식 사용 가능 |
+| Java 17    | G1 GC       | GC 다중 선택 가능 환경 완성         |
+
+### GC 선택 기준 요약
+
+| 요구                    | 추천 GC           |
+| --------------------- | --------------- |
+| **높은 처리량 (batch)**    | Parallel GC     |
+| **짧은 STW 시간 (서비스용)**  | G1 GC           |
+| **초저지연 (1ms 이내)**     | ZGC             |
+| **RedHat 환경, 커스터마이징** | Shenandoah      |
+| **개발/테스트**            | Serial GC (단순성) |
