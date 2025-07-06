@@ -108,3 +108,48 @@ malloc(size)
   OS의 **glibc malloc/free 등 표준 C 할당 함수**를 직접 호출한다.
 - 예를 들어 다음과 같은 경우 JVM 내부에서 `malloc()` 호출이 발생함.
 
+| 용도                              | 설명                                                                                |
+| ------------------------------- | --------------------------------------------------------------------------------- |
+| **JNI** (Java Native Interface) | 네이티브 라이브러리 연동 시 메모리 할당                                                            |
+| **Class Metadata**              | `Metaspace`는 `malloc` 기반으로 native 영역에 메모리 할당 (Java 8 이상)                          |
+| **Thread stack**                | 스레드 생성 시 네이티브 스택 메모리는 malloc이 아닌 `mmap` 등으로도 가능하지만, 관리자는 glibc                    |
+| **CodeCache**                   | JIT 컴파일된 코드를 저장하는 영역도 네이티브 메모리                                                    |
+| **Native buffers**              | DirectByteBuffer 등은 JVM 내부에서 `malloc()` 사용 (ex: `sun.misc.Unsafe.allocateMemory`) |
+
+
+## 힙은 malloc을 사용하지 않는다.
+> JVM의 **Java Heap (Eden, Survivor, Old 등)** 은 `malloc`**과 무관하게 JVM 내부에서 직접 관리**된다.
+
+- 이 영역은 JVM이 시작시 OS로부터 `mmap()` 또는 `sbrk()` 방식으로 **큰 덩어리를 할당받아 자체 관리**
+- GC가 직접 객체 생성/파괴를 담당하므로, malloc/free는 사용되지 않음
+- 즉, **GC가 관리하는 힙 != glibc malloc 힙**
+
+## 흐름도 
+
+```text
+[ Java 영역 ]           [ Native 영역 ]
+      ↓                       ↓
+  Java Heap             ↘  Metaspace
+ (Eden, Survivor, Old)  ↘  CodeCache
+   ⬑ GC 관리             ↘  DirectBuffer (NIO)
+                         ↘  JNI 메모리
+                         ↘  ClassLoader 영역
+                         ↘  JFR (Java Flight Recorder) 버퍼
+                         ↘  자체 C 라이브러리(native) 사용 시 malloc
+```
+
+| 항목                    | 설명                                                                 |
+| --------------------- | ------------------------------------------------------------------ |
+| **Metaspace**         | 클래스 정보 저장. Java 8부터 native 영역에 할당되며 malloc 사용                      |
+| **CodeCache**         | JIT 컴파일된 바이트코드 → 네이티브 코드 저장 (HotSpot)                              |
+| **DirectBuffer**      | `ByteBuffer.allocateDirect()` 호출 시, JVM이 malloc으로 off-heap 영역 할당   |
+| **JNI 메모리**           | C/C++로 구현된 native 모듈 내부에서 malloc 호출                                |
+| **ClassLoader**       | 사용자 정의 ClassLoader가 내부적으로 네이티브 메모리 사용할 수 있음                        |
+| **JFR 버퍼**            | Java Flight Recorder 실행 시 이벤트 데이터를 네이티브 버퍼에 저장                     |
+| **기타 C/C++ 라이브러리 연동** | 예: Netty, RocksDB, TensorFlow native binding 등이 내부적으로 malloc 사용 가능 |
+
+
+## 요약
+- OpenJDK 기반 JVM은 **Java Heap은 직접 관리**하고, **그 외 네이티브 영역은 OS의 malloc, mmap을 이용**한다.
+- 특히 **Metaspace, JNI, DirectBuffer**등의 메모리는 glibc malloc 기반이므로, **이 부분에서 단편화, 메모리 누수, 할당 병목 등이 발생할 수 있음.**
+- `-XX:NativeMemoryTracking=summary` 옵션을 사용하면, JVM이 어디서 얼마나 malloc을 사용했는지 추적 가능함.
