@@ -1,4 +1,4 @@
-package study.effective_java.item37.연습;
+package study.effective_java.연습;
 
 public enum MemberGrade {
     BRONZE, SILVER, GOLD, PLATINUM

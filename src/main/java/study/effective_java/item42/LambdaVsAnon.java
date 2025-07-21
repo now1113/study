@@ -8,7 +8,7 @@ public class LambdaVsAnon {
         Runnable anon = new Runnable() {
             @Override
             public void run() {
-                System.out.println(this.instanceName); // 오류, this는 익명 클래스 자신
+//                System.out.println(this.instanceName); // 오류, this는 익명 클래스 자신
             }
         };
 

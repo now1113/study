@@ -6,8 +6,8 @@ public class Main {
         Member member = new Member();
         audit(member);
 
-        Users users = new Users();
-        audit(users);
+//        Users users = new Users();
+//        audit(users);
     }
 
     public static <T extends Auditable> void audit(T entity) {
