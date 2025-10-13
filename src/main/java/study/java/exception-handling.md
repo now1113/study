@@ -141,3 +141,63 @@ suppressed: close failed
 자바는 **리소스 자동 해제**를 위해 `r.close()`를 호출 -> `close()`에서 **close failed** 예외가 또 발생  
 이미 **주 예외**가 있으므로 `close failed`는 **suppressed**로 **주 예외에 첨부**됨 (덮어쓰지 않음)  
 `catch`로 넘어왔을 때 `e`는 **work failed**이고, `e.getSuppressed()`에 **close failed**가 들어있다.
+
+### Checked 유지 vs Runtime 변환
+```java
+public class CheckedVsRuntimeAPI {
+    public static String readFirstLineChecked(Path path) throws IOException {
+        return Files.lines(path).findFirst().orElse("");
+    }
+
+    public static String readFirstLine(Path path) {
+        try {
+            return readFirstLineChecked(path);
+        } catch (IOException e) {
+            throw new UncheckedIOException("readFirstLine failed: " + path, e);
+        }
+    }
+
+    public static void main(String[] args) {
+        System.out.println(readFirstLine(Path.of("NO_SUCH_FILE.txt")));
+    }
+}
+```
+출력
+```
+Exception in thread "main" java.io.UncheckedIOException: readFirstLine failed: NO_SUCH_FILE.txt
+...
+Caused by: java.nio.file.NoSuchFileException: NO_SUCH_FILE.txt
+```
+- 경계(API) 아래에서는 **Checked 유지**가 유용할 때가 많고, 상위 추상화로 올라올 때 **의미 있는 Runtime 예외로 변환**해 추상화 수준을 맞춘다.
+- **cause 보존 필수**: `new new UncheckedIOException(msg, e)`
+
+### 오버라이딩 throws 규칙
+```java
+class Base {
+    void f() throws IOException {}
+}
+
+class Child extends Base {
+    @Override
+    void f() throws FileNotFoundException {
+        throw new FileNotFoundException("not found");
+    }
+}
+
+public class OverrideThrowsRule {
+    public static void main(String[] args) {
+        Base b = new Child();
+        try {
+            b.f();
+        } catch (IOException e) {
+            System.out.println("caught: " + e.getClass().getSimpleName());
+        }
+    }
+}
+```
+출력
+```text
+caught: FileNotFoundException
+```
+- 하위 메서드는 **더 넓은(상위) Checked 예외로는 확장 불가.**
+- **동일/하위 타입은 OK, Runtime은 자유.**
