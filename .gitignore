@@ -40,3 +40,6 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+# IntelliJ Git Toolbox plugin setting
+git_toolbox_prj.xml

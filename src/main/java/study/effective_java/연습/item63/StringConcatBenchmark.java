@@ -1,4 +1,4 @@
-package study.effective_java.ch09_일반적인_프로그래밍_원칙.item63;
+package study.effective_java.연습.item63;
 
 import java.util.function.IntFunction;
 
