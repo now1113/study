@@ -15,6 +15,8 @@
 ### 타입 구성
 `ApplicationContext`는 아래 기능 인터페이스를 모두 구현한다.
 
+![ApplicationContext](./img/ApplicationContext.png)
+
 - **ListableBeanFactory / HierarchicalBeanFactory** - 빈 관리 및 부모-자식 계층
 - **EnvironmentCapable** - 환경/프로퍼티
 - **MessageSource** - 국제화 메시지 해석
@@ -34,4 +36,39 @@
 | **StaticApplicationContext**                            | 소형 테스트/샘플                        | 외부 설정 없이 프로그램적으로 빈/메시지 등록.                                            |
 
 > Boot는 **웹 타입**(MVC/Reactive/None)을 감지해 위 구현중 하나를 자동 선택한다.
+
+## 핵심 인터페이스
+
+### BeanFactory
+
+**스프링 IoC 컨테이너의 '핵심 최소 집합.'**
+
+정의된 Bean을 **이름/타입으로 찾아서** 꺼내 주고, 필요하면 **만들어서** 돌려주며, 그 Bean이 어떤 스코프인지(싱글톤/프로토 타입 등) 판단할 수 있게 해주는 인터페이스다.
+
+> 최소 집합이란 **빈 조회/생성/스코프 판정**만 보장한다는 뜻이다.  
+> 메시지소스, 이벤트 퍼블리셔, 환경 프로퍼티, 리소스 로딩, AOP 자동 프록시 같은 **부가 기능은 ApplicationContext 영역**이다.
+
+
+### BeanFactory의 계약 범위
+
+BeanFactory가 보장하는 것(=최소 계약)
+
+- **LookUp(조회)**: `getBean(name|type)`으로 이름/타입 기반 조회, `getBeanProvider(type)`로 지연/옵셔널 조회
+- **Creation(생성)**: 요청 시 아직 안만들어졌다면 **정의(Bean Definition)를 읽어 의존 주입 -> 초기화 -> 캐시 등록**까지 수행.
+- **Scope 질의**: `isSingleton`, `isPrototype` 등으로 **생명주기 정책** 판단.
+- **타입/별칭 판단**: `getType`, `isTypeMatch`, `getAliases`.
+
+BeanFactory가 보장하지 않는 것
+
+- 메시지 국제화, ApplicationEvent, `Environment`/`PropertySources`, 리소스 패턴 로딩 등은 **ApplicationContext**가 추가로 제공한다.
+
+### 구현 계층
+
+- **DefaultListableBeanFactory**
+  - **등록,조회의 집합체**, BeanDefinition들을 보관/탐색/선정, **타입 매칭, 후보 선택**
+  - **(@Primary/@Qualifier), 컬렉션 주입, Optional/ObjectProvider 지원** 등 **의존성 선택 알고리즘**의 본진
+- **AbstractAutowireCapableBeanFactory**
+  - 진짜로 생성, 주입, 초기화하는 손, **생성(생성자/팩토리 메서드)** -> `populateBean`(의존주입) -> `initializeBean`(Aware/BPP/lnit 메서드) 파이프라인 제공. BeanPostProcessor 적용 지점이 여기에 있다.
+- **AbstractBeanFactory**
+  - "조회 요청을 생성 or 캐시로 보낼지 결정하는 관문". `doGetBean`에서 **캐시 히트/미스 분기**, 부모 팩토리 위임, `FactoryBean` 해석을 수행
 
